@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuwex – Smart Investing Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(180deg, #f8faff, #eef3ff);
+      text-align: center;
+      padding: 0;
+      margin: 0;
+      color: #333;
+    }
+
+    .container {
+      margin-top: 80px;
+    }
+
+    h1 {
+      color: #007bff;
+      font-size: 26px;
+    }
+
+    p {
+      color: #555;
+    }
+
+    .auth-buttons {
+      margin-top: 25px;
+    }
+
+    .auth-buttons button {
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      margin: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .auth-buttons button:hover {
+      background: linear-gradient(135deg, #0056d6, #00a4e4);
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      margin: 30px auto;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .auth-btn {
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      border: none;
+      color: white;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 600;
+    }
+
+    .auth-btn:hover {
+      background: linear-gradient(135deg, #005ad3, #00a4e4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Kuwex</h1>
+    <p>Login or Register to start investing securely.</p>
+
+    <div class="auth-buttons">
+      <button id="showLogin">Login</button>
+      <button id="showRegister">Register</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerCard" class="card" style="display:none;">
+      <h2>Register</h2>
+      <input type="email" id="registerEmail" placeholder="Enter your email">
+      <input type="password" id="registerPassword" placeholder="Create a password">
+      <button class="auth-btn" id="registerBtn">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginCard" class="card" style="display:none;">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Enter your email">
+      <input type="password" id="loginPassword" placeholder="Enter your password">
+      <button class="auth-btn" id="loginBtn">Login</button>
+    </div>
+  </div>
+
+  <script>
+    // Toggle forms
+    const loginCard = document.getElementById("loginCard");
+    const registerCard = document.getElementById("registerCard");
+
+    document.getElementById("showLogin").onclick = () => {
+      registerCard.style.display = "none";
+      loginCard.style.display = "block";
+    };
+
+    document.getElementById("showRegister").onclick = () => {
+      loginCard.style.display = "none";
+      registerCard.style.display = "block";
+    };
+
+    // Register simulation
+    document.getElementById("registerBtn").onclick = () => {
+      const email = document.getElementById("registerEmail").value.trim();
+      const password = document.getElementById("registerPassword").value.trim();
+
+      if (email && password) {
+        alert("Registration successful! Redirecting to dashboard...");
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Please fill in all fields.");
+      }
+    };
+
+    // Login simulation
+    document.getElementById("loginBtn").onclick = () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      if (email && password) {
+        alert("Login successful! Redirecting to dashboard...");
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Please enter your credentials.");
+      }
+    };
+  </script>
+</body>
+</html>
