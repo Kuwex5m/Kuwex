@@ -7,27 +7,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="dashboard">
+    <h2>Welcome to Kuwex Investments</h2>
+    <p class="brief">
+      💰 Earn while you invest!<br><br>
+      ✅ Deposit and get an instant 10% cashback (withdrawable immediately).<br>
+      🧠 Complete daily tasks and earn:
+      <ul>
+        <li>📺 Watch 5 ads → 5% of your deposit</li>
+        <li>🔍 Do research → 8%</li>
+        <li>🎥 Watch a full video → 15%</li>
+      </ul>
+      All your earnings accumulate and are withdrawable after 30 days.<br><br>
+      You can either cash out everything or reinvest your capital to grow more!
+    </p>
 
-  <nav class="navbar">
-    <h2>Kuwex Dashboard</h2>
-    <button id="logoutBtn">Logout</button>
-  </nav>
-
-  <div class="dashboard-container">
-    <div class="welcome-card">
-      <h2>Welcome, 👋</h2>
-      <p>
-        At <strong>Kuwex</strong>, your money grows daily — combine smart investing
-        with daily activity rewards.
-      </p>
-      <button id="addInvestmentBtn">Add New Investment</button>
+    <div class="plans">
+      <h3>Investment Plans</h3>
+      <div class="plan">
+        <h4>Starter</h4>
+        <p>Minimum Deposit: $100</p>
+        <p>Cashback: 10%</p>
+      </div>
+      <div class="plan">
+        <h4>Pro Investor</h4>
+        <p>Daily Tasks: Ads, Research, Videos</p>
+        <p>Withdraw earnings after 30 days</p>
+      </div>
     </div>
 
-    <!-- Motivational pop-up messages -->
-    <div id="motivationalPopup" class="popup-message"></div>
-
-    <!-- Investment plans -->
-    <div id="investmentPlans" class="investment-plans"></div>
+    <div id="motivationBox" class="motivation"></div>
+    <button onclick="logoutUser()">Logout</button>
   </div>
 
   <script src="script.js"></script>
