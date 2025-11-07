@@ -1,85 +1,119 @@
-body {
-  font-family: Poppins, sans-serif;
-  background: linear-gradient(120deg, #0a0f1f, #111831);
-  color: white;
-  text-align: center;
-  margin: 0;
-  padding: 0;
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// Switching cards
+const loginCard = document.getElementById("loginCard");
+const registerCard = document.getElementById("registerCard");
+
+if (document.getElementById("showLogin")) {
+  document.getElementById("showLogin").onclick = () => {
+    registerCard.style.display = "none";
+    loginCard.style.display = "block";
+  };
 }
 
-.auth-container {
-  margin-top: 80px;
+if (document.getElementById("showRegister")) {
+  document.getElementById("showRegister").onclick = () => {
+    loginCard.style.display = "none";
+    registerCard.style.display = "block";
+  };
 }
 
-.logo {
-  font-size: 32px;
-  font-weight: bold;
-  color: #1f6feb;
-  margin-bottom: 20px;
+// Registration
+if (document.getElementById("registerBtn")) {
+  document.getElementById("registerBtn").onclick = async () => {
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value.trim();
+    if (!email || !password) return alert("Please fill all fields");
+
+    try {
+      await auth.createUserWithEmailAndPassword(email, password);
+      alert("Registration successful! Redirecting...");
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 }
 
-.card {
-  background-color: #161b22;
-  border-radius: 15px;
-  padding: 25px;
-  margin: 10px auto;
-  width: 90%;
-  max-width: 380px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+// Login
+if (document.getElementById("loginBtn")) {
+  document.getElementById("loginBtn").onclick = async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+    if (!email || !password) return alert("Please enter your credentials");
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      alert("Login successful!");
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 }
 
-input {
-  width: 90%;
-  padding: 10px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 6px;
+// Phone authentication setup
+if (document.getElementById("sendCodeBtn")) {
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", {
+    size: "normal",
+    callback: () => console.log("reCAPTCHA verified")
+  });
+
+  document.getElementById("sendCodeBtn").onclick = () => {
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    const appVerifier = window.recaptchaVerifier;
+    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        alert("Verification code sent!");
+      })
+      .catch((err) => alert(err.message));
+  };
+
+  document.getElementById("verifyCodeBtn").onclick = () => {
+    const code = document.getElementById("verificationCode").value.trim();
+    confirmationResult.confirm(code)
+      .then(() => {
+        alert("Phone verified successfully!");
+        window.location.href = "dashboard.html";
+      })
+      .catch(() => alert("Invalid verification code"));
+  };
 }
 
-button {
-  background-color: #1f6feb;
-  border: none;
-  color: white;
-  padding: 10px 25px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: 0.3s;
+// Dashboard features
+if (document.getElementById("motivationBox")) {
+  const messages = [
+    "💪 Stay consistent — your wealth is growing!",
+    "🚀 Every task you do moves you closer to financial freedom!",
+    "🌟 Your dedication today brings rewards tomorrow!",
+    "💼 Kuwex — where smart investing meets daily growth!"
+  ];
+
+  const box = document.getElementById("motivationBox");
+  let i = 0;
+  setInterval(() => {
+    box.innerText = messages[i % messages.length];
+    i++;
+  }, 4000);
 }
 
-button:hover {
-  background-color: #388bfd;
-}
-
-.dashboard {
-  padding: 20px;
-}
-
-.plans {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 20px auto;
-  max-width: 400px;
-}
-
-.plan {
-  background-color: #1e2533;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.4);
-}
-
-.motivation {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: bold;
-  animation: pop 4s infinite;
-  color: #1f6feb;
-}
-
-@keyframes pop {
-  0% { color: #1f6feb; transform: scale(1); }
-  50% { color: #00ffcc; transform: scale(1.2); }
-  100% { color: #1f6feb; transform: scale(1); }
+// Logout
+function logoutUser() {
+  firebase.auth().signOut().then(() => {
+    alert("Logged out successfully!");
+    window.location.href = "index.html";
+  });
 }
