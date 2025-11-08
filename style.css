@@ -1,142 +1,96 @@
-body {
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(180deg, #f6f9ff, #e8f0ff);
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  color: #222;
+:root{
+  --bg:#f7fbff;
+  --card:#ffffff;
+  --accent:#0f74ff;
+  --accent-2:#00c2a8;
+  --muted:#6b7280;
+  --text:#0b1726;
+  --glass: rgba(255,255,255,0.7);
+  --shadow: 0 6px 18px rgba(3,10,24,0.12);
+  --radius:14px;
 }
 
-/* Navbar */
-.navbar {
-  background: linear-gradient(90deg, #007bff, #00c6ff);
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 25px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+/* Basic reset */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(180deg, #f6fbff 0%, #eef6ff 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-.navbar button {
-  background: white;
-  color: #007bff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 15px;
-  cursor: pointer;
-  font-weight: bold;
+/* Top bar */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 20px;
+  background:linear-gradient(90deg, rgba(15,116,255,0.95), rgba(0,194,168,0.9));
+  color:#fff;
+  box-shadow: 0 6px 20px rgba(6,30,63,0.12);
 }
+.brand{display:flex;align-items:center;gap:12px}
+.logo-img{width:56px;height:56px;object-fit:contain;border-radius:8px;background:#fff;padding:6px}
+.brand-text h1{margin:0;font-size:18px;letter-spacing:0.4px}
+.slogan{font-size:12px;opacity:0.95}
 
-.navbar button:hover {
-  background: #e8f0ff;
+/* layout */
+.main-layout{display:flex;justify-content:center;padding:32px 16px}
+.auth-panel{width:100%;max-width:420px}
+
+/* cards and inputs */
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
 }
-
-/* Welcome card */
-.dashboard-container {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.hidden{display:none}
+.auth-tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{
+  flex:1;padding:10px;border-radius:10px;border:0;background:rgba(15,116,255,0.06);cursor:pointer;font-weight:600;color:var(--accent);
 }
-
-.welcome-card {
-  background: white;
-  padding: 25px;
-  border-radius: 20px;
-  width: 90%;
-  max-width: 450px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.tab.active{background:linear-gradient(90deg,var(--accent),#2b9dff);color:#fff;box-shadow:0 6px 14px rgba(15,116,255,0.16)}
+input[type="email"],input[type="password"],input[type="tel"],input[type="text"]{
+  width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e6eef9;background:#fbfdff;
+  font-size:14px;color:var(--text)
 }
+.btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--accent),#2b9dff);color:#fff;font-weight:700;box-shadow:0 8px 18px rgba(15,116,255,0.18)}
+.btn.outline{background:transparent;border:1px solid rgba(11,23,38,0.06);color:var(--text)}
+.row{display:flex;gap:8px;align-items:center}
+.small{font-size:13px;color:var(--muted)}
+.divider{border:0;height:1px;background:#edf5ff;margin:14px 0}
 
-.welcome-card h2 {
-  color: #007bff;
+/* message box */
+.msg{margin-top:12px;padding:10px;border-radius:8px;background:#fff9db;color:#6a5200;border:1px solid #ffe8a8}
+.msg.hidden{display:none}
+
+/* Dashboard layout */
+.dashboard-main{padding:24px;max-width:920px;margin:0 auto}
+.welcome-card{text-align:center}
+.cta-row{margin-top:12px;display:flex;gap:12px;justify-content:center}
+.motivation{
+  margin-top:18px;padding:12px;border-radius:12px;background:linear-gradient(90deg, rgba(15,116,255,0.06), rgba(0,194,168,0.04));
+  font-weight:600;color:var(--accent);animation:morph 5s infinite;
 }
-
-.welcome-card button {
-  background: linear-gradient(135deg, #007bff, #00c6ff);
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 10px;
-  margin-top: 15px;
-  cursor: pointer;
-  font-weight: 600;
+@keyframes morph{
+  0%{transform:translateY(0) scale(1);color:var(--accent)}
+  50%{transform:translateY(-6px) scale(1.05);color:#00c2a8}
+  100%{transform:translateY(0) scale(1);color:var(--accent)}
 }
+.plans{margin-top:18px}
 
-.welcome-card button:hover {
-  background: linear-gradient(135deg, #005ad3, #00a4e4);
-}
+/* plan cards */
+.plan-list{display:grid;grid-template-columns:1fr;gap:12px}
+.plan{padding:14px;border-radius:12px;background:linear-gradient(0deg,#fff,#fbfdff);border:1px solid #eef6ff}
 
-/* Investment plan cards */
-.investment-plans {
-  margin-top: 30px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  padding-bottom: 50px;
-}
-
-.plan-card {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  width: 280px;
-  padding: 20px;
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.plan-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.plan-card h3 {
-  color: #007bff;
-  margin-bottom: 10px;
-}
-
-.plan-card p {
-  color: #333;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-.plan-card button {
-  background: linear-gradient(135deg, #007bff, #00c6ff);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.plan-card button:hover {
-  background: linear-gradient(135deg, #0056d6, #00a4e4);
-}
-
-/* Motivational popup */
-.popup-message {
-  position: fixed;
-  top: 80px;
-  right: 20px;
-  background: linear-gradient(135deg, #007bff, #00c6ff);
-  color: white;
-  padding: 15px 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  font-size: 15px;
-  font-weight: 500;
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: all 0.6s ease;
-  z-index: 999;
-}
-
-.popup-message.show {
-  opacity: 1;
-  transform: translateY(0);
+/* responsive */
+@media(min-width:900px){
+  .plan-list{grid-template-columns:repeat(2,1fr)}
+  .topbar{padding:18px 40px}
 }
