@@ -1,68 +1,58 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kuwex — Login</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuwex – Money Working For You</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="logo.png" />
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="script.js"></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <img src="logo.png" alt="Kuwex logo" class="logo-img">
-      <div class="brand-text">
-        <h1>Kuwex</h1>
-        <div class="slogan">Money working for you</div>
-      </div>
-    </div>
+  <header>
+    <img src="logo.png" class="logo" alt="Kuwex Logo">
+    <h1>Kuwex</h1>
+    <p>Money working for you</p>
   </header>
 
-  <main class="main-layout">
-    <section class="auth-panel">
-      <nav class="auth-tabs">
-        <button id="tabRegister" class="tab active">Register</button>
-        <button id="tabLogin" class="tab">Login</button>
-      </nav>
+  <div class="container">
+    <div class="tab-buttons">
+      <button id="loginTab" class="active">Login</button>
+      <button id="registerTab">Register</button>
+    </div>
 
-      <!-- REGISTER -->
-      <div id="registerCard" class="card">
-        <h2>Create Account</h2>
-        <input id="registerEmail" type="email" placeholder="Email" autocomplete="email">
-        <input id="registerPassword" type="password" placeholder="Password" autocomplete="new-password">
-        <button id="registerBtn" class="btn primary">Create Account</button>
-        <p class="small">Already registered? <a id="gotoLogin" href="#">Login here</a></p>
-      </div>
+    <!-- LOGIN FORM -->
+    <div id="loginForm" class="form">
+      <h3>Welcome Back</h3>
+      <form id="loginFormContent">
+        <label for="loginIdentifier">Email or Phone</label>
+        <input type="text" id="loginIdentifier" placeholder="Enter email or phone" required />
 
-      <!-- LOGIN -->
-      <div id="loginCard" class="card hidden">
-        <h2>Welcome Back</h2>
-        <input id="loginEmail" type="email" placeholder="Email" autocomplete="email">
-        <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
-        <div class="row">
-          <button id="loginBtn" class="btn primary">Login</button>
-          <button id="forgotBtn" class="btn outline">Forgot?</button>
-        </div>
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" required />
 
-        <hr class="divider">
+        <button type="submit" class="btn">Login</button>
+        <p class="forgot"><a href="#" id="resetLink">Forgot Password?</a></p>
+      </form>
+    </div>
 
-        <h3 class="small">Or sign in with Phone</h3>
-        <input id="phoneNumber" type="tel" placeholder="+254700000000 (include country code)">
-        <div id="recaptcha-container"></div>
-        <div class="row">
-          <button id="sendCodeBtn" class="btn">Send Code</button>
-          <button id="verifyCodeBtn" class="btn" style="display:none">Verify Code</button>
-        </div>
-        <input id="verificationCode" type="text" placeholder="Enter verification code" style="display:none">
+    <!-- REGISTER FORM -->
+    <div id="registerForm" class="form" style="display:none;">
+      <h3>Create Account</h3>
+      <form id="registerFormContent">
+        <label for="registerName">Full Name</label>
+        <input type="text" id="registerName" placeholder="Enter full name" required />
 
-        <p class="small">New here? <a id="gotoRegister" href="#">Create an account</a></p>
-      </div>
+        <label for="registerIdentifier">Email or Phone</label>
+        <input type="text" id="registerIdentifier" placeholder="Enter email or phone" required />
 
-      <!-- SMALL FEEDBACK / HELP -->
-      <div id="messageBox" class="msg hidden"></div>
-    </section>
-  </main>
+        <label for="registerPassword">Password</label>
+        <input type="password" id="registerPassword" placeholder="Enter password" required />
 
-  <!-- Firebase modular SDKs via CDN -->
-  <script type="module" src="script.js"></script>
+        <button type="submit" class="btn">Register</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
