@@ -1,59 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kuwex — Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuwex Dashboard</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #007bff, #00c6ff);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      color: #333;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    .logo {
+      width: 60px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    h2 {
+      margin: 10px 0;
+    }
+
+    p {
+      color: #555;
+      font-size: 15px;
+    }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <img src="logo.png" alt="Kuwex logo" class="logo-img">
-      <div class="brand-text">
-        <h1>Kuwex Dashboard</h1>
-        <div class="slogan">Money working for you</div>
-      </div>
-    </div>
-    <div class="top-actions">
-      <button id="logoutBtn" class="btn outline">Logout</button>
-    </div>
-  </header>
+  <div class="card">
+    <img src="logo.png" alt="Kuwex Logo" class="logo" />
+    <h2>Welcome to Kuwex</h2>
+    <p>Money working for you 💰</p>
+    <p id="userEmail"></p>
+    <button id="logoutBtn">Logout</button>
+  </div>
 
-  <main class="dashboard-main">
-    <section class="welcome-card card">
-      <h2 id="welcomeUser">Welcome, Investor 👋</h2>
-      <p class="muted">At Kuwex your money grows with smart investing + task rewards.</p>
+  <script type="module">
+    import { auth } from './firebase.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-      <div class="cta-row">
-        <button id="addInvestmentBtn" class="btn primary">Add New Investment</button>
-        <button id="viewPlansBtn" class="btn">View Plans</button>
-      </div>
+    const userEmail = document.getElementById('userEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-      <div id="motivationBox" class="motivation">Keep going — your wealth is growing.</div>
-    </section>
+    // Check if user is logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userEmail.textContent = "Logged in as: " + (user.email || user.phoneNumber);
+      } else {
+        // If not logged in, redirect to login page
+        window.location.href = "index.html";
+      }
+    });
 
-    <section class="plans card" id="plansSection">
-      <h3>Investment Plans</h3>
-      <div class="plan-list">
-        <article class="plan">
-          <h4>Starter</h4>
-          <p>Min deposit <strong>$100</strong> — 10% instant cashback (withdrawable immediately).</p>
-        </article>
-
-        <article class="plan">
-          <h4>Daily Rewards</h4>
-          <ul>
-            <li>5 ads watched → 5% of deposit</li>
-            <li>Research task → 8% of deposit</li>
-            <li>Video watched → 15% of deposit</li>
-          </ul>
-          <p class="muted">Earnings unlock after 30 days and become withdrawable.</p>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <script type="module" src="script.js"></script>
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+  </script>
 </body>
 </html>
