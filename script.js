@@ -1,73 +1,94 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import {
-  auth,
-  db
-} from "./firebase.js";
-import {
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-// Switch tabs
-document.getElementById("loginTab").onclick = () => {
-  document.getElementById("loginForm").style.display = "block";
-  document.getElementById("registerForm").style.display = "none";
-  document.getElementById("loginTab").classList.add("active");
-  document.getElementById("registerTab").classList.remove("active");
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyB4yjiRg1GTfS54Z0Z6J0KiFCgo2U_zItU",
+  authDomain: "kuwex-7b401.firebaseapp.com",
+  projectId: "kuwex-7b401",
+  storageBucket: "kuwex-7b401.firebasestorage.app",
+  messagingSenderId: "5986214795",
+  appId: "1:5986214795:web:e68bff5ec8af2e1bcb858e"
 };
 
-document.getElementById("registerTab").onclick = () => {
-  document.getElementById("loginForm").style.display = "none";
-  document.getElementById("registerForm").style.display = "block";
-  document.getElementById("registerTab").classList.add("active");
-  document.getElementById("loginTab").classList.remove("active");
-};
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-// REGISTER
-document.getElementById("registerFormContent").addEventListener("submit", async (e) => {
+// Tab switching
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+loginTab.addEventListener("click", () => {
+  loginTab.classList.add("active");
+  registerTab.classList.remove("active");
+  loginForm.style.display = "block";
+  registerForm.style.display = "none";
+});
+
+registerTab.addEventListener("click", () => {
+  registerTab.classList.add("active");
+  loginTab.classList.remove("active");
+  registerForm.style.display = "block";
+  loginForm.style.display = "none";
+});
+
+// Register
+registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("registerName").value;
-  const identifier = document.getElementById("registerIdentifier").value;
+  const email = document.getElementById("registerEmail").value.trim();
   const password = document.getElementById("registerPassword").value;
+  const phone = document.getElementById("countryCode").value + document.getElementById("registerPhone").value;
 
   try {
-    let email = identifier.includes("@") ? identifier : `${identifier}@kuwex-users.com`;
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await setDoc(doc(db, "users", userCredential.user.uid), {
-      name,
-      identifier,
-      createdAt: new Date()
-    });
-    alert("Registration successful!");
+    if (email) {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("Account created successfully!");
+      window.location.href = "dashboard.html";
+    } else if (phone.length > 6) {
+      alert("Phone registration setup coming soon. Please use email for now.");
+    } else {
+      alert("Please enter a valid email or phone number.");
+    }
   } catch (error) {
     alert(error.message);
   }
 });
 
-// LOGIN
-document.getElementById("loginFormContent").addEventListener("submit", async (e) => {
+// Login
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const identifier = document.getElementById("loginIdentifier").value;
+  const emailPhone = document.getElementById("loginEmailPhone").value.trim();
   const password = document.getElementById("loginPassword").value;
 
   try {
-    let email = identifier.includes("@") ? identifier : `${identifier}@kuwex-users.com`;
-    await signInWithEmailAndPassword(auth, email, password);
-    alert("Login successful!");
+    if (emailPhone.includes("@")) {
+      await signInWithEmailAndPassword(auth, emailPhone, password);
+      window.location.href = "dashboard.html";
+    } else {
+      alert("Phone login setup coming soon. Please use email login for now.");
+    }
   } catch (error) {
     alert(error.message);
   }
 });
 
-// RESET PASSWORD
-document.getElementById("resetLink").addEventListener("click", async (e) => {
+// Forgot Password
+document.getElementById("forgotPassword").addEventListener("click", async (e) => {
   e.preventDefault();
-  const email = prompt("Enter your email to reset password:");
+  const email = prompt("Enter your registered email to reset your password:");
   if (!email) return;
+
   try {
     await sendPasswordResetEmail(auth, email);
-    alert("Password reset email sent!");
+    alert("Password reset email sent. Check your inbox.");
   } catch (error) {
     alert(error.message);
   }
