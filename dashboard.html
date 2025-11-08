@@ -9,83 +9,180 @@
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(to right, #007bff, #00c6ff);
-      color: #fff;
-      text-align: center;
       margin: 0;
       padding: 0;
-      height: 100vh;
+      color: #333;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
 
-    .card {
+    .header {
+      text-align: center;
+      color: white;
+      margin-top: 40px;
+    }
+
+    .header img {
+      width: 70px;
+    }
+
+    .content {
       background: white;
-      color: #333;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
       padding: 30px;
-      border-radius: 15px;
+      margin: 20px;
+      max-width: 800px;
       width: 90%;
-      max-width: 400px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     }
 
-    .logo {
-      width: 60px;
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+
+    p {
+      line-height: 1.6;
+      font-size: 15px;
+      text-align: justify;
+    }
+
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .plan {
+      background: linear-gradient(135deg, #f9f9f9, #e6f0ff);
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .plan:hover {
+      transform: translateY(-5px);
+    }
+
+    .plan h3 {
+      color: #007bff;
       margin-bottom: 10px;
     }
 
-    button {
+    .plan p {
+      margin: 5px 0;
+      color: #555;
+    }
+
+    .plan button {
+      margin-top: 10px;
       background: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .plan button:hover {
+      background: #0056b3;
+    }
+
+    #logoutBtn {
+      background: #ff5252;
       color: white;
       border: none;
       padding: 10px 25px;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 15px;
+      margin: 20px 0;
+      font-weight: bold;
     }
 
-    button:hover {
-      background: #0056b3;
+    #logoutBtn:hover {
+      background: #d93c3c;
     }
 
-    h2 {
-      margin: 10px 0;
-    }
-
-    p {
-      color: #555;
-      font-size: 15px;
+    footer {
+      color: white;
+      margin-bottom: 20px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img src="logo.png" alt="Kuwex Logo" class="logo" />
-    <h2>Welcome to Kuwex</h2>
+  <div class="header">
+    <img src="logo.png" alt="Kuwex Logo" />
+    <h1>Kuwex Dashboard</h1>
     <p>Money working for you 💰</p>
-    <p id="userEmail"></p>
-    <button id="logoutBtn">Logout</button>
   </div>
+
+  <div class="content">
+    <h2>Welcome to Kuwex!</h2>
+    <p>
+      At Kuwex, your money doesn’t sleep — it works for you! 💼 Our investment platform allows you to grow your income effortlessly by choosing one of our carefully designed plans.
+      Each plan offers different levels of return and risk so you can invest at your comfort. Once you invest, our automated system begins generating earnings daily.
+      Withdraw your profits anytime, or let them compound for higher returns.
+    </p>
+    <p>
+      To begin, simply pick a plan below that matches your budget. You can start small, watch your returns, and grow your investment as you gain trust in the system. 
+      Kuwex is built with transparency and real-time tracking to give you full control over your investments.
+    </p>
+
+    <div class="plans">
+      <div class="plan">
+        <h3>💎 Starter Plan</h3>
+        <p>Minimum: $10</p>
+        <p>Return: 5% weekly</p>
+        <p>Duration: 1 Month</p>
+        <button>Invest Now</button>
+      </div>
+
+      <div class="plan">
+        <h3>🚀 Pro Plan</h3>
+        <p>Minimum: $50</p>
+        <p>Return: 8% weekly</p>
+        <p>Duration: 2 Months</p>
+        <button>Invest Now</button>
+      </div>
+
+      <div class="plan">
+        <h3>👑 Elite Plan</h3>
+        <p>Minimum: $200</p>
+        <p>Return: 12% weekly</p>
+        <p>Duration: 3 Months</p>
+        <button>Invest Now</button>
+      </div>
+    </div>
+
+    <center>
+      <button id="logoutBtn">Logout</button>
+    </center>
+  </div>
+
+  <footer>
+    &copy; 2025 Kuwex. All rights reserved.
+  </footer>
 
   <script type="module">
     import { auth } from './firebase.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-    const userEmail = document.getElementById('userEmail');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    // Check if user is logged in
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        userEmail.textContent = "Logged in as: " + (user.email || user.phoneNumber);
-      } else {
-        // If not logged in, redirect to login page
+      if (!user) {
         window.location.href = "index.html";
       }
     });
 
-    // Logout
     logoutBtn.addEventListener('click', async () => {
       await signOut(auth);
       window.location.href = "index.html";
