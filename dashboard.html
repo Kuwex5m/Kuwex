@@ -1,45 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kuwex Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuwex — Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="dashboard">
-    <h2>Welcome to Kuwex Investments</h2>
-    <p class="brief">
-      💰 Earn while you invest!<br><br>
-      ✅ Deposit and get an instant 10% cashback (withdrawable immediately).<br>
-      🧠 Complete daily tasks and earn:
-      <ul>
-        <li>📺 Watch 5 ads → 5% of your deposit</li>
-        <li>🔍 Do research → 8%</li>
-        <li>🎥 Watch a full video → 15%</li>
-      </ul>
-      All your earnings accumulate and are withdrawable after 30 days.<br><br>
-      You can either cash out everything or reinvest your capital to grow more!
-    </p>
-
-    <div class="plans">
-      <h3>Investment Plans</h3>
-      <div class="plan">
-        <h4>Starter</h4>
-        <p>Minimum Deposit: $100</p>
-        <p>Cashback: 10%</p>
-      </div>
-      <div class="plan">
-        <h4>Pro Investor</h4>
-        <p>Daily Tasks: Ads, Research, Videos</p>
-        <p>Withdraw earnings after 30 days</p>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="Kuwex logo" class="logo-img">
+      <div class="brand-text">
+        <h1>Kuwex Dashboard</h1>
+        <div class="slogan">Money working for you</div>
       </div>
     </div>
+    <div class="top-actions">
+      <button id="logoutBtn" class="btn outline">Logout</button>
+    </div>
+  </header>
 
-    <div id="motivationBox" class="motivation"></div>
-    <button onclick="logoutUser()">Logout</button>
-  </div>
+  <main class="dashboard-main">
+    <section class="welcome-card card">
+      <h2 id="welcomeUser">Welcome, Investor 👋</h2>
+      <p class="muted">At Kuwex your money grows with smart investing + task rewards.</p>
 
-  <script src="script.js"></script>
+      <div class="cta-row">
+        <button id="addInvestmentBtn" class="btn primary">Add New Investment</button>
+        <button id="viewPlansBtn" class="btn">View Plans</button>
+      </div>
+
+      <div id="motivationBox" class="motivation">Keep going — your wealth is growing.</div>
+    </section>
+
+    <section class="plans card" id="plansSection">
+      <h3>Investment Plans</h3>
+      <div class="plan-list">
+        <article class="plan">
+          <h4>Starter</h4>
+          <p>Min deposit <strong>$100</strong> — 10% instant cashback (withdrawable immediately).</p>
+        </article>
+
+        <article class="plan">
+          <h4>Daily Rewards</h4>
+          <ul>
+            <li>5 ads watched → 5% of deposit</li>
+            <li>Research task → 8% of deposit</li>
+            <li>Video watched → 15% of deposit</li>
+          </ul>
+          <p class="muted">Earnings unlock after 30 days and become withdrawable.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>
