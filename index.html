@@ -1,46 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kuwex – Money Working for You</title>
-  <link rel="icon" type="image/png" href="logo.png" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuwex — Login / Register</title>
+  <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <img src="logo.png" alt="Kuwex Logo" class="logo" />
-    <h1>Kuwex</h1>
-    <p>Money working for you</p>
+  <main class="auth-wrap">
+    <div class="auth-card">
+      <img src="logo.png" alt="Kuwex logo" class="auth-logo" />
+      <h1 class="brand">Kuwex</h1>
+      <p class="tag">Money working for you</p>
 
-    <div class="tabs">
-      <div id="loginTab" class="tab active">Login</div>
-      <div id="registerTab" class="tab">Register</div>
+      <div class="tabs">
+        <button id="tab-login" class="tab active">Login</button>
+        <button id="tab-register" class="tab">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <form id="loginForm" class="form">
+        <input id="loginEmailPhone" type="text" placeholder="Email or phone (with country code)" autocomplete="username" required />
+        <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" required />
+        <button class="primary" type="submit">Login</button>
+        <div class="help-row">
+          <a href="#" id="forgotPassword">Forgot Password?</a>
+        </div>
+      </form>
+
+      <!-- REGISTER -->
+      <form id="registerForm" class="form hidden">
+        <input id="registerName" type="text" placeholder="Full name" required />
+        <div class="phone-row">
+          <select id="countryCode" aria-label="country code">
+            <option value="+254">🇰🇪 +254 (Kenya)</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+234">🇳🇬 +234</option>
+            <option value="+91">🇮🇳 +91</option>
+            <option value="+61">🇦🇺 +61</option>
+          </select>
+          <input id="registerPhone" type="text" placeholder="Phone (omit leading 0)" />
+        </div>
+        <input id="registerEmail" type="email" placeholder="Email (recommended)" />
+        <input id="registerPassword" type="password" placeholder="Create password (min 6 chars)" required />
+        <button class="primary" type="submit">Create account</button>
+        <p class="muted">You can register by email or phone. Phone OTP requires additional setup (see docs).</p>
+      </form>
+
     </div>
-
-    <form id="loginForm">
-      <input type="text" id="loginEmailPhone" placeholder="Email or Phone" required />
-      <input type="password" id="loginPassword" placeholder="Password" required />
-      <button type="submit">Login</button>
-      <p><a href="#" id="forgotPassword">Forgot Password?</a></p>
-    </form>
-
-    <form id="registerForm">
-      <input type="text" id="registerName" placeholder="Full Name" required />
-      <select id="countryCode" required>
-        <option value="+1">🇺🇸 +1 (US)</option>
-        <option value="+44">🇬🇧 +44 (UK)</option>
-        <option value="+91">🇮🇳 +91 (India)</option>
-        <option value="+254" selected>🇰🇪 +254 (Kenya)</option>
-        <option value="+61">🇦🇺 +61 (Australia)</option>
-        <option value="+234">🇳🇬 +234 (Nigeria)</option>
-      </select>
-      <input type="text" id="registerPhone" placeholder="Phone Number (omit 0)" />
-      <input type="email" id="registerEmail" placeholder="Email" />
-      <input type="password" id="registerPassword" placeholder="Password" required />
-      <button type="submit">Create Account</button>
-    </form>
-  </div>
+  </main>
 
   <script type="module" src="script.js"></script>
 </body>
