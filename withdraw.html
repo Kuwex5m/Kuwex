@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuwex - Withdraw</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5f7fa;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #007bff;
+    }
+
+    input {
+      width: 80%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h2>Withdraw Funds</h2>
+  <p>Request a withdrawal from your Kuwex account. Minimum KES 200.</p>
+
+  <input type="number" id="amount" placeholder="Enter amount (KES)" />
+  <input type="text" id="phone" placeholder="Your M-Pesa number" />
+  <br />
+  <button id="withdrawBtn">Submit Request</button>
+
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    import {
+      doc,
+      getDoc,
+      updateDoc,
+      collection,
+      addDoc,
+      increment
+    } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+    let userUID = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userUID = user.uid;
+      } else {
+        alert("Please login first.");
+        window.location.href = "index.html";
+      }
+    });
+
+    document.getElementById("withdrawBtn").onclick = async function () {
+      const amount = Number(document.getElementById("amount").value);
+      const phone = document.getElementById("phone").value.trim();
+
+      if (amount < 200) {
+        alert("Minimum withdrawal is KES 200.");
+        return;
+      }
+
+      if (!phone) {
+        alert("Please enter your M-Pesa number.");
+        return;
+      }
+
+      const userRef = doc(db, "users", userUID);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+
+        if (userData.balance >= amount) {
+          await updateDoc(userRef, {
+            balance: increment(-amount),
+            totalWithdrawals: increment(amount)
+          });
+
+          await addDoc(collection(db, "withdrawals"), {
+            userId: userUID,
+            amount: amount,
+            phone: phone,
+            status: "pending",
+            date: new Date().toISOString()
+          });
+
+          alert("Withdrawal request submitted successfully!");
+          window.location.href = "home.html";
+        } else {
+          alert("Insufficient balance.");
+        }
+      }
+    };
+  </script>
+</body>
+</html>
