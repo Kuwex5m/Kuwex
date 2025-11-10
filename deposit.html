@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuwex — Deposit BTC (Manual)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card header">
+      <img src="logo.png" class="logo" alt="Kuwex">
+      <div><h1>Deposit BTC</h1><div class="notice">Send BTC to: <strong>TDhmDFs7UL5qjs4Aj9WdWbf9bmXhXSpC1U</strong></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Submit Deposit Proof</h3>
+      <div class="notice">After sending BTC to the address above, please provide amount (USD), TXID and upload a screenshot for verification.</div>
+
+      <label>Amount (USD)</label>
+      <input id="amount" class="input" type="number" placeholder="e.g., 100" />
+
+      <label>Your BTC address (from)</label>
+      <input id="fromAddress" class="input" placeholder="Your sending BTC address" />
+
+      <label>Transaction ID (TXID)</label>
+      <input id="txid" class="input" placeholder="Paste the blockchain TXID" />
+
+      <label>Upload screenshot (optional but recommended)</label>
+      <input id="screenshot" type="file" accept="image/*" />
+
+      <button id="submitDeposit" class="btn">Submit Deposit</button>
+      <div id="result" class="notice"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db, storage } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+
+    let currentUser = null;
+    onAuthStateChanged(auth, (u) => {
+      if(!u) { window.location.href = 'index.html'; return; }
+      currentUser = u;
+    });
+
+    document.getElementById('submitDeposit').onclick = async () => {
+      const amount = Number(document.getElementById('amount').value);
+      const from = document.getElementById('fromAddress').value.trim();
+      const txid = document.getElementById('txid').value.trim();
+      const fileEl = document.getElementById('screenshot');
+      if(!currentUser) return alert('Login required');
+      if(!amount || amount < 100) return alert('Minimum deposit 100 USD');
+      if(!txid) return alert('Enter TXID');
+
+      const createdAt = new Date().toISOString();
+      const docData = {
+        userId: currentUser.uid,
+        amount_usd: amount,
+        currency: 'BTC',
+        fromAddress: from || null,
+        txid,
+        screenshotURL: null,
+        status: 'pending',
+        createdAt
+      };
+
+      document.getElementById('result').textContent = 'Uploading... please wait';
+
+      try {
+        // upload screenshot if provided
+        if(fileEl.files && fileEl.files[0]){
+          const file = fileEl.files[0];
+          const storageRef = ref(storage, `deposits/${currentUser.uid}_${Date.now()}_${file.name}`);
+          const snapshot = await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(snapshot.ref);
+          docData.screenshotURL = url;
+        }
+
+        // save deposit request
+        await addDoc(collection(db, 'deposits'), docData);
+        document.getElementById('result').textContent = 'Deposit submitted — pending admin verification.';
+        setTimeout(()=> window.location.href = 'dashboard.html', 1200);
+      } catch(e) {
+        console.error(e);
+        alert('Error: ' + e.message);
+      }
+    };
+  </script>
+</body>
+</html>
