@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuwex Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card header">
+      <img src="logo.png" class="logo" alt="Kuwex">
+      <div><h1>Admin — Approve Deposits</h1><div class="notice">Only admin should access this page.</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Pending Deposits</h3>
+      <div id="list">Loading...</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { collection, query, where, getDocs, doc, updateDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    // REPLACE with your admin email (the account you'll login with)
+    const ADMIN_EMAIL = "admin@kuwex.com";
+
+    const listEl = document.getElementById('list');
+
+    onAuthStateChanged(auth, async (user) => {
+      if(!user) return window.location.href = 'index.html';
+      if(user.email !== ADMIN_EMAIL) {
+        alert('Unauthorized — admin only');
+        return window.location.href = 'dashboard.html';
+      }
+      await loadPending();
+    });
+
+    async function loadPending(){
+      listEl.innerHTML = 'Loading...';
+      const q = query(collection(db, 'deposits'), where('status', '==', 'pending'));
+      const snap = await getDocs(q);
+      if(snap.empty) { listEl.innerHTML = '<div class="notice">No pending deposits</div>'; return; }
+      listEl.innerHTML = '';
+      snap.forEach(docu=>{
+        const d = docu.data();
+        const id = docu.id;
+        const div = document.createElement('div');
+        div.style.borderBottom = '1px solid #eef2f7';
+        div.style.padding = '10px 0';
+        div.innerHTML = `
+          <div><strong>${d.amount_usd} USD</strong> — ${d.currency} — <span class="notice">TXID: ${d.txid}</span></div>
+          <div class="notice">From: ${d.fromAddress || 'N/A'}</div>
+          <div style="margin-top:8px">
+            <button class="btn" onclick="approve('${id}')">Approve</button>
+            <button class="btn ghost" onclick="decline('${id}')">Decline</button>
+            <a class="btn ghost small" href="${d.screenshotURL || '#'}" target="_blank">${d.screenshotURL ? 'View Proof' : 'No Proof'}</a>
+          </div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    window.approve = async (id) => {
+      if(!confirm('Approve this deposit and credit user?')) return;
+      const depRef = doc(db, 'deposits', id);
+      const depSnap = await getDoc(depRef);
+      if(!depSnap.exists()) return alert('Not found');
+      const d = depSnap.data();
+      // update deposit status
+      await updateDoc(depRef, { status: 'approved', approvedAt: new Date().toISOString(), approvedBy: auth.currentUser.email });
+      // credit user: add amount to balance_usd and totalDeposits_usd; add 10% cashback to balance immediately
+      const userRef = doc(db, 'users', d.userId);
+      // NOTE: we read current user doc, update values to avoid overwrite
+      const userSnap = await getDoc(userRef);
+      if(!userSnap.exists()){
+        alert('User doc not found — aborting');
+        return;
+      }
+      const userData = userSnap.data();
+      const prevBalance = Number(userData.balance_usd || 0);
+      const prevDeposits = Number(userData.totalDeposits_usd || 0);
+      const amount = Number(d.amount_usd || 0);
+      const cashback = Math.round(amount * 0.10 * 100) / 100; // 10%
+      const newBalance = prevBalance + amount + cashback;
+      await updateDoc(userRef, {
+        balance_usd: newBalance,
+        totalDeposits_usd: prevDeposits + amount
+      });
+      // record a transaction entry in 'transactions' collection
+      await addDoc(collection(db, 'transactions'), {
+        userId: d.userId,
+        type: 'deposit',
+        amount_usd: amount,
+        cashback_usd: cashback,
+        depositId: id,
+        createdAt: new Date().toISOString()
+      });
+      alert('Deposit approved and user credited (including 10% cashback).');
+      loadPending();
+    };
+
+    window.decline = async (id) => {
+      if(!confirm('Decline this deposit?')) return;
+      await updateDoc(doc(db, 'deposits', id), { status:'declined', declinedAt: new Date().toISOString() });
+      alert('Deposit declined.');
+      loadPending();
+    };
+  </script>
+</body>
+</html>
