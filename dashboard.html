@@ -1,105 +1,70 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kuwex — Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuwex Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="card header">
-      <img src="logo.png" class="logo" alt="Kuwex">
-      <div>
-        <h1>Kuwex</h1>
-        <div class="notice">Manual BTC deposits — send to: <strong>TDhmDFs7UL5qjs4Aj9WdWbf9bmXhXSpC1U</strong></div>
+  <header>
+    <img src="logo.png" alt="Kuwex Logo" class="logo" />
+    <h1>Welcome, <span id="username">Loading...</span></h1>
+  </header>
+
+  <main>
+    <section class="info">
+      <div class="card">
+        <h3>Deposit</h3>
+        <p id="deposit">Loading...</p>
       </div>
-      <div style="margin-left:auto">
-        <button id="btnLogout" class="btn small">Logout</button>
+      <div class="card">
+        <h3>Main Balance</h3>
+        <p id="balance">Loading...</p>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <h3>Your Account</h3>
-      <div id="userEmail">Loading...</div>
-      <div class="row" style="margin-top:12px">
-        <div class="col card">
-          <div class="notice">Main Balance (USD)</div>
-          <div id="balance" style="font-size:20px;font-weight:800">0.00</div>
-        </div>
-        <div class="col card">
-          <div class="notice">Total Deposits (USD)</div>
-          <div id="totalDeposits" style="font-size:20px;font-weight:800">0.00</div>
-        </div>
+    <section class="invest">
+      <h2>Manual Deposit via Bitcoin</h2>
+      <p>Send your investment to this BTC address:</p>
+      <div class="btc-box">
+        <strong>TDhmDFs7UL5qjs4Aj9WdWbf9bmXhXSpC1U</strong>
       </div>
+      <p>Currency: USD</p>
+      <p>Network: BTC</p>
 
-      <div style="margin-top:12px" class="row">
-        <button id="btnDeposit" class="btn">Deposit BTC (Manual)</button>
-        <a class="btn ghost" href="deposit.html">Make Deposit</a>
-        <a class="btn ghost" href="progress.html">Progress</a>
-        <a class="btn ghost" href="admin.html">Admin (protected)</a>
+      <div class="deposit-form">
+        <input type="number" id="amount" placeholder="Enter deposit amount (KSH)" />
+        <input type="file" id="proof" accept="image/*" />
+        <button onclick="uploadProof()">Upload Screenshot</button>
       </div>
+    </section>
 
-      <div id="ref" class="notice" style="margin-top:12px">Referral: (generated after login)</div>
-    </div>
+    <section class="plans">
+      <h2>Investment Plans</h2>
+      <div class="plan">
+        <h3>Starter Plan</h3>
+        <p>Minimum: KSH 500</p>
+        <p>Return: 10% after 24 hours</p>
+      </div>
+      <div class="plan">
+        <h3>Pro Plan</h3>
+        <p>Minimum: KSH 2000</p>
+        <p>Return: 25% after 48 hours</p>
+      </div>
+      <div class="plan">
+        <h3>Elite Plan</h3>
+        <p>Minimum: KSH 5000</p>
+        <p>Return: 50% after 72 hours</p>
+      </div>
+    </section>
+  </main>
 
-    <div class="card">
-      <h3>Recent Deposits (pending)</h3>
-      <div id="pendingList">Loading...</div>
-    </div>
-  </div>
+  <footer>
+    <p>Kuwex © 2025 | All rights reserved.</p>
+  </footer>
 
-  <script type="module">
-    import { auth, db } from './firebase.js';
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-    import { doc, getDoc, query, collection, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-
-    const userEmailEl = document.getElementById('userEmail');
-    const balanceEl = document.getElementById('balance');
-    const depositsEl = document.getElementById('totalDeposits');
-    const refEl = document.getElementById('ref');
-    const pendingList = document.getElementById('pendingList');
-
-    onAuthStateChanged(auth, async (user) => {
-      if(!user) {
-        window.location.href = 'index.html';
-        return;
-      }
-      // show user email
-      userEmailEl.textContent = user.email || user.phoneNumber;
-      // referral
-      const link = `${location.origin}${location.pathname.replace(/\/[^/]*$/, '/') }?ref=${user.uid}`;
-      refEl.textContent = `Referral: ${link}`;
-
-      // load user doc
-      const udoc = await getDoc(doc(db, 'users', user.uid));
-      if(udoc.exists()){
-        const data = udoc.data();
-        balanceEl.textContent = (data.balance_usd||0).toFixed(2);
-        depositsEl.textContent = (data.totalDeposits_usd||0).toFixed(2);
-      }
-
-      // show last pending deposits by this user
-      const q = query(collection(db, 'deposits'), where('userId','==', user.uid), orderBy('createdAt','desc'), limit(5));
-      const snap = await getDocs(q);
-      if(snap.empty) pendingList.textContent = 'No deposits yet.';
-      else {
-        pendingList.innerHTML = '';
-        snap.forEach(s=>{
-          const d = s.data();
-          const el = document.createElement('div');
-          el.innerHTML = `<div style="padding:8px;border-bottom:1px solid #eef2f7">
-            <strong>${d.amount_usd} USD</strong> • ${d.currency} • ${d.status || 'pending'}<br>
-            TXID: ${d.txid || '-'}<br>
-            <small class="notice">Submitted: ${new Date(d.createdAt).toLocaleString()}</small>
-          </div>`;
-          pendingList.appendChild(el);
-        });
-      }
-    });
-
-    document.getElementById('btnLogout').onclick = async () => { await signOut(auth); window.location.href='index.html' }
-    document.getElementById('btnDeposit').onclick = () => { window.location.href='deposit.html' }
-  </script>
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
