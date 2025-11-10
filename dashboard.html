@@ -1,325 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kuwex — Dashboard</title>
-  <link rel="icon" href="logo.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --blue-1:#007bff;
-      --blue-2:#00c6ff;
-      --muted:#6b7280;
-      --surface:#f7fbff;
-      --card:#fff;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:'Poppins',sans-serif;
-      background: linear-gradient(180deg,#eaf6ff,#fff);
-      color:#0b1726;
-      -webkit-font-smoothing:antialiased;
-    }
-    .wrap{max-width:980px;margin:18px auto;padding:12px}
-    .hero{
-      background: linear-gradient(90deg,var(--blue-1),var(--blue-2));
-      color:#fff;border-radius:14px;padding:18px;display:flex;gap:16px;align-items:center;
-      box-shadow:0 8px 30px rgba(3,10,24,0.12)
-    }
-    .hero img{width:64px;height:64px;border-radius:12px;background:rgba(255,255,255,0.08);padding:8px}
-    .hero h1{margin:0;font-size:20px}
-    .hero p{margin:4px 0 0 0;opacity:0.95}
-
-    .content{background:var(--card);border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 8px 24px rgba(3,10,24,0.06)}
-    .section-title{color:var(--blue-1);margin:0 0 12px 0;font-size:18px}
-
-    /* explanation modal */
-    .explain-btn{background:transparent;border:1px solid rgba(11,23,38,0.06);padding:8px 12px;border-radius:10px;cursor:pointer}
-    .modal-backdrop{position:fixed;inset:0;background:rgba(3,10,24,0.45);display:flex;align-items:center;justify-content:center;z-index:60}
-    .modal{background:#fff;padding:20px;border-radius:12px;max-width:780px;width:94%;box-shadow:0 14px 40px rgba(3,10,24,0.2)}
-    .modal h2{margin-top:0;color:var(--blue-1)}
-    .modal p{line-height:1.6;color:#334155}
-
-    /* plans */
-    .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:10px}
-    .plan{
-      background:linear-gradient(135deg,#fff 0%, #f2fbff 100%);
-      border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(3,10,24,0.06);display:flex;flex-direction:column;gap:10px;
-    }
-    .plan .title{font-weight:700;color:#042a4a}
-    .plan .price{font-weight:800;color:var(--blue-1);font-size:18px}
-    .plan .meta{color:var(--muted);font-size:13px}
-    .plan .buy{margin-top:auto;padding:10px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--blue-1),var(--blue-2));color:#fff;font-weight:700;cursor:pointer}
-
-    /* referral */
-    .ref-row{display:flex;gap:10px;align-items:center;margin-top:14px}
-    .ref-link{flex:1;padding:10px;border-radius:10px;background:#f8fafc;border:1px solid #eef5ff;color:#0b1726;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .copy-btn{background:var(--blue-1);color:#fff;padding:8px 12px;border-radius:10px;border:0;cursor:pointer}
-
-    /* top actions */
-    .top-actions{margin-left:auto;display:flex;gap:10px}
-    .logout{background:#ff5252;color:#fff;padding:8px 12px;border-radius:10px;border:0;cursor:pointer}
-
-    .status{margin-top:12px;color:green;font-weight:700}
-
-    /* bottom nav for mobile */
-    .bottom-nav{position:fixed;left:12px;right:12px;bottom:12px;height:64px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:space-around;box-shadow:0 8px 20px rgba(3,10,24,0.08)}
-    .nav-item{text-align:center;font-size:12px;color:#334155}
-    .nav-item .ic{font-size:18px;display:block}
-
-    @media(min-width:900px){
-      .bottom-nav{display:none}
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuwex Dashboard</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <div style="display:flex;gap:12px;align-items:center">
-      <div class="hero" style="flex:1">
-        <img src="logo.png" alt="Kuwex" />
-        <div style="flex:1">
-          <h1>Kuwex</h1>
-          <p>Money working for you — deposit, complete tasks, and earn daily rewards.</p>
-        </div>
-        <div class="top-actions">
-          <button id="explainBtn" class="explain-btn">How it works</button>
-          <button id="logoutBtn" class="logout">Logout</button>
-        </div>
-      </div>
-    </div>
+  <div class="dashboard">
+    <img src="logo.png" alt="Kuwex Logo" class="logo" />
+    <h2>Welcome to Kuwex</h2>
+    <p id="userEmail"></p>
 
-    <div class="content">
-      <h3 class="section-title">Welcome, investor</h3>
+    <div class="motivation" id="motivationText">💎 Your money never sleeps — make it work for you!</div>
 
-      <!-- long in-page explanation (visible) -->
-      <p style="color:#334155;line-height:1.6">
-        At Kuwex, deposits immediately earn you a <strong>10% cashback</strong> of your deposit — this cashback can be withdrawn right away.
-        The platform minimum deposit is <strong>$100</strong>. After deposit you'll receive daily tasks (watching ads, completing research, watching videos).
-        Completing tasks earns percentages based on your deposit and task type (ads/research/videos). All daily task earnings accumulate and become withdrawable after <strong>30 days</strong>.
-        After 30 days you may withdraw your earnings and the original deposit, or withdraw earnings only and keep the deposit invested to continue earning.
+    <div class="info">
+      <h3>How Kuwex Investment Works</h3>
+      <p>
+        Once you deposit, you instantly get a <b>10% cashback</b> that you can withdraw right away.  
+        Minimum deposit is <b>Ksh 100</b>, no maximum.  
+        You’ll complete daily tasks — watching ads, doing research, and watching videos — each rewarding you up to <b>15% daily</b>.  
+        All task earnings are added to your balance and become withdrawable after <b>30 days</b>.  
+        You may withdraw all or reinvest to continue growing.
       </p>
-
-      <!-- referral -->
-      <div class="ref-row">
-        <div id="refLink" class="ref-link">Invite link will appear here</div>
-        <button id="copyRef" class="copy-btn">Copy</button>
-      </div>
-
-      <!-- Investment plans -->
-      <h3 style="margin-top:16px" class="section-title">Investment Plans</h3>
-      <div class="plans" id="plansContainer"></div>
-
-      <div id="status" class="status" aria-live="polite"></div>
     </div>
+
+    <div class="plans">
+      <h3>Investment Plans</h3>
+      <div class="plan">💼 Starter — Ksh 100 - Ksh 999</div>
+      <div class="plan">🚀 Premium — Ksh 1,000 - Ksh 9,999</div>
+      <div class="plan">👑 Elite — Ksh 10,000 and above</div>
+    </div>
+
+    <button id="investBtn">Deposit / Invest</button>
+    <a href="progress.html" class="link">View Investment Progress</a>
+    <button id="logoutBtn" class="logout">Logout</button>
   </div>
 
-  <!-- explanation modal (hidden by default) -->
-  <template id="explainTpl">
-    <div class="modal-backdrop" id="modalBackdrop">
-      <div class="modal" role="dialog" aria-modal="true">
-        <h2>How Kuwex Investments Work</h2>
-        <p>
-          Welcome to Kuwex — your simple path to daily earnings. Here’s the full breakdown:
-        </p>
-        <ul>
-          <li><strong>Immediate cashback:</strong> When you deposit, you instantly receive a <strong>10% cashback</strong> of the deposit value. This cashback is withdrawable immediately.</li>
-          <li><strong>Minimum deposit:</strong> $100 (no maximum).</li>
-          <li><strong>Daily tasks:</strong> You’ll receive tasks every day — watching ads, completing research tasks we assign, and watching videos. Each completed task adds earnings to your account based on your deposit.</li>
-          <li><strong>Task payouts:</strong>
-            <ul>
-              <li>Every 5 ads watched to completion → <strong>5% of your deposit</strong></li>
-              <li>Each research assignment completed → <strong>8% of your deposit</strong></li>
-              <li>Each video watched to completion → <strong>15% of your deposit</strong></li>
-            </ul>
-          </li>
-          <li><strong>Withdrawal rule:</strong> Task earnings are added to your earnings balance and become withdrawable after <strong>30 days</strong>. After 30 days you can withdraw your earnings and the initial deposit, or withdraw earnings only and keep the deposit to continue compounding.</li>
-          <li><strong>Referral bonus:</strong> Invite friends to earn referral bonuses (shown in your referral area).</li>
-          <li><strong>Security & fairness:</strong> Kuwex monitors activity to ensure tasks are completed correctly before crediting final payouts. All deposits should be made through the payment gateway and verified by our backend.</li>
-        </ul>
-        <p style="margin-top:12px">Happy investing — be consistent, and let your money work for you!</p>
-        <div style="text-align:right;margin-top:8px">
-          <button id="closeModal" style="padding:8px 12px;border-radius:8px;background:var(--blue-1);color:#fff;border:0;cursor:pointer">Close</button>
-        </div>
-      </div>
-    </div>
-  </template>
-
-  <!-- Paystack inline script -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-
   <script type="module">
-    // ---------- Firebase auth (init & check) ----------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { auth } from './firebase.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyB4yjiRg1GTfS54Z0Z6J0KiFCgo2U_zItU",
-      authDomain: "kuwex-7b401.firebaseapp.com",
-      projectId: "kuwex-7b401",
-      storageBucket: "kuwex-7b401.firebasestorage.app",
-      messagingSenderId: "5986214795",
-      appId: "1:5986214795:web:e68bff5ec8af2e1bcb858e"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // ---------- UI refs ----------
-    const explainBtn = document.getElementById('explainBtn');
-    const refLinkEl = document.getElementById('refLink');
-    const copyRefBtn = document.getElementById('copyRef');
-    const plansContainer = document.getElementById('plansContainer');
-    const statusEl = document.getElementById('status');
+    const userEmail = document.getElementById('userEmail');
     const logoutBtn = document.getElementById('logoutBtn');
+    const motivation = document.getElementById('motivationText');
 
-    // Paystack public key (you provided)
-    const PAYSTACK_PUBLIC_KEY = "pk_test_b035589be935c459bfe47ee8caba53f60eb08cf4";
-
-    // Plans you confirmed
-    const plans = [
-      { id:'starter', title:'Starter Plan', price:20, range:'$20 - $99', daily:'10% daily' },
-      { id:'silver', title:'Silver Plan', price:100, range:'$100 - $499', daily:'15% daily' },
-      { id:'gold', title:'Gold Plan', price:500, range:'$500 - $999', daily:'20% daily' },
-      { id:'vip', title:'VIP Plan', price:1000, range:'$1,000+', daily:'25% daily' }
+    const messages = [
+      "💡 Keep pushing — your success story starts here!",
+      "💰 Smart investments, brighter tomorrow!",
+      "🔥 Consistency builds fortune — stay invested!",
+      "🌍 Your financial freedom journey begins now!"
     ];
 
-    // render plans
-    function renderPlans(){
-      plansContainer.innerHTML = '';
-      plans.forEach(plan=>{
-        const card = document.createElement('div');
-        card.className = 'plan';
-        card.innerHTML = `
-          <div class="title">${plan.title}</div>
-          <div class="price">${plan.price} USD</div>
-          <div class="meta">${plan.range} • ${plan.daily}</div>
-          <div style="margin-top:8px"><button class="buy" data-id="${plan.id}" data-price="${plan.price}">Invest / Deposit</button></div>
-        `;
-        plansContainer.appendChild(card);
-      });
+    setInterval(() => {
+      motivation.textContent = messages[Math.floor(Math.random() * messages.length)];
+    }, 4000);
 
-      // attach clicks
-      document.querySelectorAll('.buy').forEach(b=>{
-        b.addEventListener('click', onBuyClick);
-      });
-    }
-
-    // When user clicks Invest/Deposit
-    async function onBuyClick(e){
-      const btn = e.currentTarget;
-      const planId = btn.dataset.id;
-      const amountUSD = Number(btn.dataset.price) || 100;
-      // make sure user is logged in (auth guard)
-      const user = currentUser;
-      if(!user){
-        alert('Please login to deposit.');
-        return;
-      }
-
-      // Create a unique reference
-      const reference = 'KUWEX_' + Math.floor((Math.random()*1e9));
-
-      // Prepare Paystack payment
-      const handler = PaystackPop.setup({
-        key: PAYSTACK_PUBLIC_KEY,
-        email: user.email || (user.phoneNumber ? (user.phoneNumber + '@kuwex.local') : 'user@kuwex.com'),
-        amount: Math.round(amountUSD * 100), // Paystack expects amount in kobo/cents (for USD use cents)
-        currency: 'USD',
-        ref: reference,
-        metadata: {
-          userId: user.uid,
-          planId,
-          planPrice: amountUSD
-        },
-        onClose: function(){
-          statusEl.style.color = 'orange';
-          statusEl.textContent = 'Payment window closed — no payment made.';
-        },
-        callback: function(response){
-          // Payment completed client-side. IMPORTANT: verify on the server using Paystack secret key.
-          statusEl.style.color = 'green';
-          statusEl.textContent = `Payment complete! Ref: ${response.reference}. Verifying...`;
-
-          // OPTIONAL: call your backend to verify the payment and credit user's account.
-          // Example (you must implement /verify-payment on your server using Paystack secret key):
-          /*
-          fetch('https://YOUR_SERVER_URL/verify-payment', {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ reference: response.reference })
-          }).then(r=>r.json()).then(data=>{
-            if(data.success){ statusEl.textContent = 'Payment verified and credited.'; }
-            else { statusEl.style.color='red'; statusEl.textContent = 'Payment could not be verified yet.'; }
-          });
-          */
-
-          // For now, show success (but do server verify in production!)
-          setTimeout(()=> {
-            statusEl.textContent += ' (Client-side success shown; server verification recommended.)';
-          }, 900);
-        }
-      });
-      handler.openIframe();
-    }
-
-    // explanation modal
-    explainBtn.addEventListener('click', ()=>{
-      const tpl = document.getElementById('explainTpl');
-      const node = tpl.content.cloneNode(true);
-      document.body.appendChild(node);
-      document.getElementById('closeModal').addEventListener('click', ()=> {
-        const backdrop = document.getElementById('modalBackdrop');
-        if(backdrop) backdrop.remove();
-      });
+    onAuthStateChanged(auth, (user) => {
+      if (user) userEmail.textContent = "Logged in as: " + (user.email || user.phoneNumber);
+      else window.location.href = "index.html";
     });
 
-    // copy referral
-    copyRefBtn.addEventListener('click', async ()=>{
-      const txt = refLinkEl.textContent || '';
-      if(!txt) return alert('No referral link yet.');
-      try{
-        await navigator.clipboard.writeText(txt);
-        alert('Referral link copied to clipboard.');
-      }catch(e){
-        alert('Copy failed — manually select and copy the link.');
-      }
-    });
-
-    // ---------- Firebase auth state ----------
-    let currentUser = null;
-    onAuthStateChanged(auth, user=>{
-      if(!user){
-        // not logged in — redirect to login
-        location.href = 'index.html';
-        return;
-      }
-      currentUser = user;
-      // show referral link using uid (or email)
-      const uid = user.uid || 'guest';
-      const origin = location.origin;
-      const path = location.pathname.replace(/\/[^/]*$/, '/');
-      // create compact referral link
-      const link = `${origin}${path}?ref=${uid}`;
-      refLinkEl.textContent = link;
-    });
-
-    // logout
-    logoutBtn.addEventListener('click', async ()=>{
+    logoutBtn.addEventListener('click', async () => {
       await signOut(auth);
-      location.href = 'index.html';
+      window.location.href = "index.html";
     });
 
-    // init
-    renderPlans();
+    document.getElementById('investBtn').onclick = () => window.location.href = 'progress.html';
   </script>
-
-  <!-- bottom nav (mobile) -->
-  <nav class="bottom-nav" aria-hidden="false">
-    <div class="nav-item"><span class="ic">🏠</span>Home</div>
-    <div class="nav-item"><span class="ic">⭐</span>Plans</div>
-    <div class="nav-item"><span class="ic">💬</span>Tasks</div>
-    <div class="nav-item"><span class="ic">👥</span>Team</div>
-  </nav>
 </body>
-  </html>
+</html>
