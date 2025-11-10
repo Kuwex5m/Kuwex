@@ -1,73 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kuwex Dashboard</title>
-  <link rel="icon" type="image/png" href="logo.png" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuwex — Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="dashboard">
-    <img src="logo.png" alt="Kuwex Logo" class="logo" />
-    <h2>Welcome to Kuwex</h2>
-    <p id="userEmail"></p>
-
-    <div class="motivation" id="motivationText">💎 Your money never sleeps — make it work for you!</div>
-
-    <div class="info">
-      <h3>How Kuwex Investment Works</h3>
-      <p>
-        Once you deposit, you instantly get a <b>10% cashback</b> that you can withdraw right away.  
-        Minimum deposit is <b>Ksh 100</b>, no maximum.  
-        You’ll complete daily tasks — watching ads, doing research, and watching videos — each rewarding you up to <b>15% daily</b>.  
-        All task earnings are added to your balance and become withdrawable after <b>30 days</b>.  
-        You may withdraw all or reinvest to continue growing.
-      </p>
+  <div class="container">
+    <div class="card header">
+      <img src="logo.png" class="logo" alt="Kuwex">
+      <div>
+        <h1>Kuwex</h1>
+        <div class="notice">Manual BTC deposits — send to: <strong>TDhmDFs7UL5qjs4Aj9WdWbf9bmXhXSpC1U</strong></div>
+      </div>
+      <div style="margin-left:auto">
+        <button id="btnLogout" class="btn small">Logout</button>
+      </div>
     </div>
 
-    <div class="plans">
-      <h3>Investment Plans</h3>
-      <div class="plan">💼 Starter — Ksh 100 - Ksh 999</div>
-      <div class="plan">🚀 Premium — Ksh 1,000 - Ksh 9,999</div>
-      <div class="plan">👑 Elite — Ksh 10,000 and above</div>
+    <div class="card">
+      <h3>Your Account</h3>
+      <div id="userEmail">Loading...</div>
+      <div class="row" style="margin-top:12px">
+        <div class="col card">
+          <div class="notice">Main Balance (USD)</div>
+          <div id="balance" style="font-size:20px;font-weight:800">0.00</div>
+        </div>
+        <div class="col card">
+          <div class="notice">Total Deposits (USD)</div>
+          <div id="totalDeposits" style="font-size:20px;font-weight:800">0.00</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="row">
+        <button id="btnDeposit" class="btn">Deposit BTC (Manual)</button>
+        <a class="btn ghost" href="deposit.html">Make Deposit</a>
+        <a class="btn ghost" href="progress.html">Progress</a>
+        <a class="btn ghost" href="admin.html">Admin (protected)</a>
+      </div>
+
+      <div id="ref" class="notice" style="margin-top:12px">Referral: (generated after login)</div>
     </div>
 
-    <button id="investBtn">Deposit / Invest</button>
-    <a href="progress.html" class="link">View Investment Progress</a>
-    <button id="logoutBtn" class="logout">Logout</button>
+    <div class="card">
+      <h3>Recent Deposits (pending)</h3>
+      <div id="pendingList">Loading...</div>
+    </div>
   </div>
 
   <script type="module">
-    import { auth } from './firebase.js';
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { doc, getDoc, query, collection, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-    const userEmail = document.getElementById('userEmail');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const motivation = document.getElementById('motivationText');
+    const userEmailEl = document.getElementById('userEmail');
+    const balanceEl = document.getElementById('balance');
+    const depositsEl = document.getElementById('totalDeposits');
+    const refEl = document.getElementById('ref');
+    const pendingList = document.getElementById('pendingList');
 
-    const messages = [
-      "💡 Keep pushing — your success story starts here!",
-      "💰 Smart investments, brighter tomorrow!",
-      "🔥 Consistency builds fortune — stay invested!",
-      "🌍 Your financial freedom journey begins now!"
-    ];
+    onAuthStateChanged(auth, async (user) => {
+      if(!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      // show user email
+      userEmailEl.textContent = user.email || user.phoneNumber;
+      // referral
+      const link = `${location.origin}${location.pathname.replace(/\/[^/]*$/, '/') }?ref=${user.uid}`;
+      refEl.textContent = `Referral: ${link}`;
 
-    setInterval(() => {
-      motivation.textContent = messages[Math.floor(Math.random() * messages.length)];
-    }, 4000);
+      // load user doc
+      const udoc = await getDoc(doc(db, 'users', user.uid));
+      if(udoc.exists()){
+        const data = udoc.data();
+        balanceEl.textContent = (data.balance_usd||0).toFixed(2);
+        depositsEl.textContent = (data.totalDeposits_usd||0).toFixed(2);
+      }
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) userEmail.textContent = "Logged in as: " + (user.email || user.phoneNumber);
-      else window.location.href = "index.html";
+      // show last pending deposits by this user
+      const q = query(collection(db, 'deposits'), where('userId','==', user.uid), orderBy('createdAt','desc'), limit(5));
+      const snap = await getDocs(q);
+      if(snap.empty) pendingList.textContent = 'No deposits yet.';
+      else {
+        pendingList.innerHTML = '';
+        snap.forEach(s=>{
+          const d = s.data();
+          const el = document.createElement('div');
+          el.innerHTML = `<div style="padding:8px;border-bottom:1px solid #eef2f7">
+            <strong>${d.amount_usd} USD</strong> • ${d.currency} • ${d.status || 'pending'}<br>
+            TXID: ${d.txid || '-'}<br>
+            <small class="notice">Submitted: ${new Date(d.createdAt).toLocaleString()}</small>
+          </div>`;
+          pendingList.appendChild(el);
+        });
+      }
     });
 
-    logoutBtn.addEventListener('click', async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
-    });
-
-    document.getElementById('investBtn').onclick = () => window.location.href = 'progress.html';
+    document.getElementById('btnLogout').onclick = async () => { await signOut(auth); window.location.href='index.html' }
+    document.getElementById('btnDeposit').onclick = () => { window.location.href='deposit.html' }
   </script>
 </body>
 </html>
