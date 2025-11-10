@@ -1,54 +1,37 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+// script.js
+import { db, doc, getDoc, updateDoc } from "./firebase.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB4yjiRg1GTfS54Z0Z6J0KiFCgo2U_zItU",
-  authDomain: "kuwex-7b401.firebaseapp.com",
-  projectId: "kuwex-7b401",
-  storageBucket: "kuwex-7b401.firebasestorage.app",
-  messagingSenderId: "5986214795",
-  appId: "1:5986214795:web:e68bff5ec8af2e1bcb858e"
-};
+const userId = "TestUser"; // Replace with actual user login ID later
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-document.getElementById('registerBtn').addEventListener('click', async () => {
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-  const phone = document.getElementById('phone').value;
+async function loadUserData() {
   try {
-    const user = await createUserWithEmailAndPassword(auth, email, pass);
-    await setDoc(doc(db, "users", user.user.uid), {
-      email, phone, deposit: 0, dailyEarnings: 0
-    });
-    alert("Registration successful!");
-    window.location.href = "dashboard.html";
-  } catch (err) {
-    alert(err.message);
-  }
-});
+    const userRef = doc(db, "Users", userId);
+    const userSnap = await getDoc(userRef);
 
-document.getElementById('loginBtn').addEventListener('click', async () => {
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    window.location.href = "dashboard.html";
-  } catch (err) {
-    alert(err.message);
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      document.getElementById("username").innerText = data.name || "User";
+      document.getElementById("deposit").innerText = `KSH ${data.deposit || 0}`;
+      document.getElementById("balance").innerText = `KSH ${data.balance || 0}`;
+    } else {
+      alert("No user data found in Firestore!");
+    }
+  } catch (error) {
+    console.error("Error loading data:", error);
   }
-});
+}
 
-document.getElementById('forgotPassword').addEventListener('click', async () => {
-  const email = prompt("Enter your email to reset password:");
-  if (!email) return;
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Password reset email sent!");
-  } catch (err) {
-    alert(err.message);
+async function uploadProof() {
+  const fileInput = document.getElementById("proof");
+  const amountInput = document.getElementById("amount");
+  if (!fileInput.files.length || !amountInput.value) {
+    alert("Please enter amount and upload screenshot.");
+    return;
   }
-});
+  alert("Deposit submitted successfully. Admin will verify and update your balance.");
+  amountInput.value = "";
+  fileInput.value = "";
+}
+
+window.onload = loadUserData;
+window.uploadProof = uploadProof;
