@@ -1,28 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kuwex - Sign In / Register</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kuwex — Sign in / Register</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" type="image/png" href="logo.png" />
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" alt="Kuwex Logo" class="logo" />
-    <h2>Welcome to Kuwex</h2>
-    <p>Earn more with every smart investment 💰</p>
-
-    <div class="form-box">
-      <input type="email" id="email" placeholder="Email address" />
-      <input type="tel" id="phone" placeholder="Phone number (optional)" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="registerBtn">Register</button>
-      <button id="loginBtn">Login</button>
-      <a id="forgotPassword">Forgot Password?</a>
+    <div class="card header">
+      <img src="logo.png" class="logo" alt="Kuwex">
+      <div>
+        <h1>Kuwex</h1>
+        <div class="notice">Manual BTC deposits — send to: <strong>TDhmDFs7UL5qjs4Aj9WdWbf9bmXhXSpC1U</strong></div>
+      </div>
     </div>
+
+    <div class="card">
+      <h3>Register</h3>
+      <input id="regEmail" class="input" placeholder="Email" />
+      <input id="regPassword" class="input" placeholder="Password (min 6)" type="password" />
+      <button id="btnRegister" class="btn">Create account</button>
+      <div class="notice">Already have an account? Use the Login form below</div>
+    </div>
+
+    <div class="card">
+      <h3>Login</h3>
+      <input id="loginEmail" class="input" placeholder="Email" />
+      <input id="loginPassword" class="input" placeholder="Password" type="password" />
+      <button id="btnLogin" class="btn">Login</button>
+      <div class="notice"><a href="#" id="forgot">Forgot password?</a></div>
+    </div>
+
   </div>
 
-  <script type="module" src="script.js"></script>
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      sendPasswordResetEmail,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    // prevent auto-redirect if already logged in (user must navigate)
+    onAuthStateChanged(auth, (user) => {
+      // do nothing here — dashboard will handle redirect after explicit login
+    });
+
+    document.getElementById('btnRegister').onclick = async () => {
+      const email = document.getElementById('regEmail').value.trim();
+      const pass = document.getElementById('regPassword').value;
+      if(!email || !pass) return alert('Enter email and password.');
+      try {
+        const uc = await createUserWithEmailAndPassword(auth, email, pass);
+        // create initial user doc
+        await setDoc(doc(db, 'users', uc.user.uid), {
+          email,
+          balance_usd: 0,
+          totalDeposits_usd: 0,
+          totalWithdrawals_usd: 0,
+          plan: null,
+          createdAt: new Date().toISOString()
+        });
+        alert('Account created. Redirecting to dashboard.');
+        window.location.href = 'dashboard.html';
+      } catch(e) { alert(e.message) }
+    };
+
+    document.getElementById('btnLogin').onclick = async () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      if(!email || !pass) return alert('Enter credentials');
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        window.location.href = 'dashboard.html';
+      } catch(e) { alert(e.message) }
+    };
+
+    document.getElementById('forgot').onclick = async (e) => {
+      e.preventDefault();
+      const email = prompt('Enter your account email for reset:');
+      if(!email) return;
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert('Reset email sent (check spam).');
+      } catch(e) { alert(e.message) }
+    };
+  </script>
 </body>
 </html>
